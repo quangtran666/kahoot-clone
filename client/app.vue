@@ -1,3 +1,5 @@
 <template>
-  <div class="underline text-sm">Hello</div>
+  <NuxtLayout>
+    <NuxtPage />
+  </NuxtLayout>
 </template>
