@@ -68,8 +68,26 @@ const state = ref({
   username: "",
 })
 
+interface Event {
+  type: string;
+  payload: ChatEvent;
+}
+
+interface ChatEvent {
+  username: string;
+  message: string;
+}
+
 const sendMessage = async (event: FormSubmitEvent<Schema>) => {
-  webSocket.value?.send(event.data.message)
+  const eventMessage: Event = {
+    type: "send_message",
+    payload: {
+      username: event.data.username,
+      message: event.data.message,
+    }
+  }
+  
+  webSocket.value?.send(JSON.stringify(eventMessage));
 }
 
 const webSocket = ref<WebSocket | null>(null);
