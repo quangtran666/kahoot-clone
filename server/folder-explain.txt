@@ -1,0 +1,23 @@
+﻿server/
+├── cmd/
+│   └── api/                  # Entry point for the application
+│       └── main.go
+├── internal/                 # Private application code
+│   ├── domain/               # Core domain models and interfaces
+│   │   ├── event/            # Event definitions and interfaces
+│   │   └── game/             # Game logic and models
+│   ├── handlers/             # HTTP and WebSocket handlers
+│   ├── service/              # Business logic implementation
+│   ├── websocket/            # WebSocket implementation
+│   │   ├── client.go
+│   │   ├── manager.go
+│   │   └── hub.go
+│   └── config/               # Configuration management
+├── pkg/                      # Public libraries that can be used by other projects
+│   ├── protocol/             # Protocol definitions
+│   └── utils/                # Utility functions
+├── .env
+├── .gitignore
+├── Makefile
+├── go.mod
+└── go.sum
