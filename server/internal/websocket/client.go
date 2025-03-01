@@ -2,6 +2,7 @@
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/quangtran666/kahoot-clone/internal/domain/event"
 	"log"
@@ -20,6 +21,7 @@ func NewClient(conn *websocket.Conn, hub *Hub) *Client {
 		connection: conn,
 		Hub:        hub,
 		Egress:     make(chan []byte),
+		UserId:     uuid.New().String(),
 	}
 }
 
@@ -35,7 +37,6 @@ func (client *Client) ReadMessages() {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error reading message: %v", err)
 			}
-			log.Println("client disconnected")
 			break // Break the loop to close connection and clean up
 		}
 

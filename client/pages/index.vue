@@ -97,10 +97,6 @@ const messageText = computed(() => messages.value.join("\n"));
 onMounted(() => {
   webSocket.value = new WebSocket("ws://localhost:8080/ws");
   
-  webSocket.value.onopen = () => {
-    console.log("WebSocket connection established");
-  }
-  
   webSocket.value.onmessage = (event: MessageEvent) => {
     messages.value.push(event.data);
   }

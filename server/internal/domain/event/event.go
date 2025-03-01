@@ -10,11 +10,6 @@ const (
 	UserDisconnected EventType = "user_disconnected"
 )
 
-// Event interface for all events
-type Event interface {
-	Type() EventType
-}
-
 // IncomingEvent represents an event coming from clients
 type IncomingEvent struct {
 	Type    EventType       `json:"type"`

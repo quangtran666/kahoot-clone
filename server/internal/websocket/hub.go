@@ -2,9 +2,10 @@
 
 import (
 	"errors"
-	"github.com/quangtran666/kahoot-clone/internal/domain/event"
 	"log"
 	"sync"
+
+	"github.com/quangtran666/kahoot-clone/internal/domain/event"
 )
 
 // Hub manages all the active clients.
@@ -16,6 +17,7 @@ type Hub struct {
 	BroadcastExceptSelf chan BroadcastMessageData
 	sync.RWMutex
 	EventHandlers map[event.EventType]EventHandler
+	Services      map[string]interface{}
 }
 
 // EventHandler defines a signature for event handlers.
@@ -24,16 +26,21 @@ type EventHandler func(event event.IncomingEvent, client *Client) error
 func NewHub() *Hub {
 	return &Hub{
 		Clients:             make(map[*Client]bool),
-		Register:            make(chan *Client),
-		Unregister:          make(chan *Client),
-		Broadcast:           make(chan []byte),
-		BroadcastExceptSelf: make(chan BroadcastMessageData),
+		Register:            make(chan *Client, 100),
+		Unregister:          make(chan *Client, 100),
+		Broadcast:           make(chan []byte, 100),
+		BroadcastExceptSelf: make(chan BroadcastMessageData, 100),
 		EventHandlers:       make(map[event.EventType]EventHandler),
+		Services:            make(map[string]interface{}),
 	}
 }
 
 func (hub *Hub) RegisterEventHandler(eventType event.EventType, handler EventHandler) {
 	hub.EventHandlers[eventType] = handler
+}
+
+func (hub *Hub) RegisterService(name string, service interface{}) {
+	hub.Services[name] = service
 }
 
 func (hub *Hub) routeEventToHandler(event event.IncomingEvent, client *Client) error {
@@ -72,7 +79,14 @@ func (hub *Hub) RegisterClient(client *Client) {
 	defer hub.Unlock()
 
 	hub.Clients[client] = true
-	log.Println("Add client to hub")
+	log.Printf("client %v registered", client.UserId)
+
+	// Notify to other clients about the new client
+	if gameService, ok := hub.Services["game"]; ok {
+		if gs, ok := gameService.(interface{ HandleUserConnected(*Client) error }); ok {
+			go gs.HandleUserConnected(client)
+		}
+	}
 }
 
 func (hub *Hub) UnregisterClient(client *Client) {
@@ -80,10 +94,18 @@ func (hub *Hub) UnregisterClient(client *Client) {
 	defer hub.Unlock()
 
 	if _, ok := hub.Clients[client]; ok {
+		// Notify to other clients about the disconnection
+		if gameService, ok := hub.Services["game"]; ok {
+			if gs, ok := gameService.(interface{ HandleUserDisconnected(*Client) error }); ok {
+				gs.HandleUserDisconnected(client)
+			}
+		}
+
+		log.Printf("client %v unregistered", client.UserId)
+
 		delete(hub.Clients, client)
 		close(client.Egress)
 		client.connection.Close()
-		log.Println("Removing client from hub")
 	} else {
 		log.Printf("Client not found in hub")
 	}

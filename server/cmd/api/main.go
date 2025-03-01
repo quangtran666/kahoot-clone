@@ -26,8 +26,7 @@ func main() {
 	gameService := service.NewGameService(hub)
 
 	hub.RegisterEventHandler(event.SendMessage, gameService.HandleSendMessage)
-	hub.RegisterEventHandler(event.UserConnected, gameService.HandleUserConnected)
-	hub.RegisterEventHandler(event.UserDisconnected, gameService.HandleUserDisconnected)
+	hub.RegisterService("game", gameService)
 
 	wsHandler := handlers.NewWebSocketHandler(hub)
 
