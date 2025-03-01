@@ -13,7 +13,7 @@ type Client struct {
 	connection *websocket.Conn
 	Hub        *Hub
 	Egress     chan []byte
-	UserId     string
+	UserId     string // Somehow add username to client
 }
 
 func NewClient(conn *websocket.Conn, hub *Hub) *Client {

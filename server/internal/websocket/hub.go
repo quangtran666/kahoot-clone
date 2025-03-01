@@ -2,13 +2,12 @@
 
 import (
 	"errors"
+	"github.com/quangtran666/kahoot-clone/internal/domain/event"
 	"log"
 	"sync"
-
-	"github.com/quangtran666/kahoot-clone/internal/domain/event"
 )
 
-// Hub manages all the active clients.
+// Hub only manages active Websocket connections (not game/room state)
 type Hub struct {
 	Clients             map[*Client]bool
 	Register            chan *Client
@@ -80,13 +79,6 @@ func (hub *Hub) RegisterClient(client *Client) {
 
 	hub.Clients[client] = true
 	log.Printf("client %v registered", client.UserId)
-
-	// Notify to other clients about the new client
-	if gameService, ok := hub.Services["game"]; ok {
-		if gs, ok := gameService.(interface{ HandleUserConnected(*Client) error }); ok {
-			go gs.HandleUserConnected(client)
-		}
-	}
 }
 
 func (hub *Hub) UnregisterClient(client *Client) {
@@ -94,14 +86,12 @@ func (hub *Hub) UnregisterClient(client *Client) {
 	defer hub.Unlock()
 
 	if _, ok := hub.Clients[client]; ok {
-		// Notify to other clients about the disconnection
-		if gameService, ok := hub.Services["game"]; ok {
-			if gs, ok := gameService.(interface{ HandleUserDisconnected(*Client) error }); ok {
-				gs.HandleUserDisconnected(client)
+		// Let room service know that client is disconnecting
+		if roomService, ok := hub.Services["room"]; ok {
+			if rs, ok := roomService.(interface{ HandleClientDisconnect(*Client) error }); ok {
+				rs.HandleClientDisconnect(client)
 			}
 		}
-
-		log.Printf("client %v unregistered", client.UserId)
 
 		delete(hub.Clients, client)
 		close(client.Egress)

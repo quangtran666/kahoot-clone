@@ -23,10 +23,16 @@ func main() {
 
 	go hub.Run()
 
-	gameService := service.NewGameService(hub)
+	roomService := service.NewRoomService(hub)
+	gameService := service.NewGameService(hub, roomService)
 
 	hub.RegisterEventHandler(event.SendMessage, gameService.HandleSendMessage)
+	hub.RegisterEventHandler(event.CreateRoom, roomService.CreateRoom)
+	hub.RegisterEventHandler(event.JoinRoom, roomService.JoinRoom)
+	hub.RegisterEventHandler(event.LeaveRoom, roomService.LeaveRoom)
+
 	hub.RegisterService("game", gameService)
+	hub.RegisterService("room", roomService)
 
 	wsHandler := handlers.NewWebSocketHandler(hub)
 

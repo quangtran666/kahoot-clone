@@ -8,6 +8,13 @@ const (
 	SendMessage      EventType = "send_message"
 	UserConnected    EventType = "user_connected"
 	UserDisconnected EventType = "user_disconnected"
+
+	CreateRoom EventType = "create_room"
+	JoinRoom   EventType = "join_room"
+	LeaveRoom  EventType = "leave_room"
+	RoomLeft   EventType = "room_left"
+
+	Error EventType = "error"
 )
 
 // IncomingEvent represents an event coming from clients
@@ -36,10 +43,23 @@ type SendMessagePayload struct {
 	Username string `json:"username"`
 }
 
-type UserConnectedPayload struct {
+type CreateRoomPayload struct {
+	RoomName string `json:"room_name"`
+}
+
+type JoinRoomPayload struct {
+	RoomCode string `json:"room_code"`
 	Username string `json:"username"`
 }
 
-type UserDisconnectedPayload struct {
+type RoomJoinedPayload struct {
 	Username string `json:"username"`
+}
+
+type RoomLeftPayload struct {
+	Username string `json:"username"`
+}
+
+type RoomClosedPayload struct {
+	RoomCode string `json:"room_code"`
 }
