@@ -2,8 +2,9 @@
 
 import (
 	"encoding/json"
-	"github.com/quangtran666/kahoot-clone/internal/domain/event"
 	"log"
+
+	"github.com/quangtran666/kahoot-clone/internal/domain/event"
 
 	"github.com/quangtran666/kahoot-clone/internal/websocket"
 )

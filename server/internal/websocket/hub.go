@@ -97,6 +97,7 @@ func (hub *Hub) UnregisterClient(client *Client) {
 		delete(hub.Clients, client) // Remove client from hub
 		close(client.Egress)        // Close the Egress channel
 		client.connection.Close()   // Close the websocket connection
+		log.Printf("client %v unregistered", client.UserId)
 	} else {
 		log.Printf("Client not found in hub")
 	}

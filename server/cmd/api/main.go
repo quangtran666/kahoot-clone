@@ -43,6 +43,8 @@ func main() {
 		w.Write([]byte("Kahoot Clone API"))
 	})
 
+	log.Println("Server started on port", os.Getenv("PORT"))
+
 	if err := http.ListenAndServe(os.Getenv("PORT"), nil); err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}

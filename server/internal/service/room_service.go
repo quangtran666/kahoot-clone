@@ -3,11 +3,12 @@
 import (
 	"encoding/json"
 	"errors"
+	"log"
+	"sync"
+
 	"github.com/quangtran666/kahoot-clone/internal/domain/event"
 	"github.com/quangtran666/kahoot-clone/internal/domain/room"
 	"github.com/quangtran666/kahoot-clone/internal/websocket"
-	"log"
-	"sync"
 )
 
 type RoomService interface {
@@ -80,6 +81,7 @@ func (r *roomService) JoinRoom(eventIncoming event.IncomingEvent, client *websoc
 		return err
 	}
 
+	log.Printf("Client %v joined room %v", client.UserId, payload.RoomCode)
 	return nil
 }
 
@@ -114,6 +116,7 @@ func (r *roomService) HandleClientDisconnect(client *websocket.Client) error {
 
 	for _, room := range r.rooms {
 		if room.HasClient(client) {
+			log.Printf("Client %v disconnected from room %v", client.UserId, room.Code)
 			r.leaveRoom(room, client)
 			break
 		}

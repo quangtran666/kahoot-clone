@@ -1,9 +1,10 @@
 ﻿package handlers
 
 import (
+	"net/http"
+
 	"github.com/gorilla/websocket"
 	internalWebSocket "github.com/quangtran666/kahoot-clone/internal/websocket"
-	"net/http"
 )
 
 var upgrader = websocket.Upgrader{
