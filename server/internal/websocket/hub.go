@@ -2,9 +2,10 @@
 
 import (
 	"errors"
-	"github.com/quangtran666/kahoot-clone/internal/domain/event"
 	"log"
 	"sync"
+
+	"github.com/quangtran666/kahoot-clone/internal/domain/event"
 )
 
 // Hub only manages active Websocket connections (not game/room state)
@@ -93,9 +94,9 @@ func (hub *Hub) UnregisterClient(client *Client) {
 			}
 		}
 
-		delete(hub.Clients, client)
-		close(client.Egress)
-		client.connection.Close()
+		delete(hub.Clients, client) // Remove client from hub
+		close(client.Egress)        // Close the Egress channel
+		client.connection.Close()   // Close the websocket connection
 	} else {
 		log.Printf("Client not found in hub")
 	}

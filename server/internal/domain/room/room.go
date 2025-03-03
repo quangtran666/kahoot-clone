@@ -1,11 +1,12 @@
 ﻿package room
 
 import (
-	"github.com/google/uuid"
-	"github.com/quangtran666/kahoot-clone/internal/websocket"
 	"math/rand"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/quangtran666/kahoot-clone/internal/websocket"
 )
 
 const (

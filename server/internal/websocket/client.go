@@ -2,18 +2,27 @@
 
 import (
 	"encoding/json"
+	"log"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/quangtran666/kahoot-clone/internal/domain/event"
-	"log"
+)
+
+var (
+	// pongWait is the duration we wait before closing a connection due to ping timeouts.
+	pongWait = 10 * time.Second
+	// pingInterval has to be less than pongWait. because it will send new ping before the pongWait
+	pingInterval = (pongWait * 9) / 10
 )
 
 // Client represents a connected Websocket client.
 type Client struct {
 	connection *websocket.Conn
 	Hub        *Hub
-	Egress     chan []byte
-	UserId     string // Somehow add username to client
+	Egress     chan []byte // Egress = Đầu ra
+	UserId     string      // Somehow add username to client
 }
 
 func NewClient(conn *websocket.Conn, hub *Hub) *Client {
@@ -29,6 +38,16 @@ func (client *Client) ReadMessages() {
 	defer func() {
 		client.Hub.Unregister <- client
 	}()
+
+	// Configure wait time for pong message,
+	// This has to be set before the first initial ping
+	if err := client.connection.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
+		log.Printf("error setting read deadline: %v", err)
+		return
+	}
+
+	// Configure how to handle pong response
+	client.connection.SetPongHandler(client.pongHandler)
 
 	for {
 		_, payload, err := client.connection.ReadMessage()
@@ -53,6 +72,13 @@ func (client *Client) ReadMessages() {
 }
 
 func (client *Client) WriteMessages() {
+	// Create a ticker that trigger a ping at given interval
+	ticker := time.NewTicker(pingInterval)
+	defer func() {
+		ticker.Stop()
+		client.Hub.Unregister <- client
+	}()
+
 	for {
 		select {
 		case message, ok := <-client.Egress:
@@ -66,6 +92,18 @@ func (client *Client) WriteMessages() {
 				log.Printf("error writing message: %v", err)
 				return
 			}
+		case <-ticker.C:
+			// Send the ping
+			if err := client.connection.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
+				log.Printf("error writing ping message: %v", err)
+				return // break the loop to close connection and clean up
+			}
 		}
 	}
+}
+
+// pongHanlder use to handle pong message from client
+func (client *Client) pongHandler(string) error {
+	// Reset the read deadline
+	return client.connection.SetReadDeadline(time.Now().Add(pongWait))
 }

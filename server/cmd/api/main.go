@@ -1,14 +1,15 @@
 ﻿package main
 
 import (
+	"log"
+	"net/http"
+	"os"
+
 	"github.com/joho/godotenv"
 	"github.com/quangtran666/kahoot-clone/internal/domain/event"
 	"github.com/quangtran666/kahoot-clone/internal/handlers"
 	"github.com/quangtran666/kahoot-clone/internal/service"
 	"github.com/quangtran666/kahoot-clone/internal/websocket"
-	"log"
-	"net/http"
-	"os"
 )
 
 func init() {
