@@ -52,6 +52,7 @@ func (r *roomService) CreateRoom(eventIncoming event.IncomingEvent, client *webs
 	// Send back the room code to the client who created the room
 	if err := newRoom.SendToClient(client, event.RoomCreated, event.RoomCreatedPayload{
 		RoomCode: newRoom.Code,
+		RoomName: newRoom.Name,
 	}); err != nil {
 		log.Printf("Error sending room code to client: %v", err)
 		return err
@@ -84,6 +85,7 @@ func (r *roomService) JoinRoom(eventIncoming event.IncomingEvent, client *websoc
 	// Notify other clients in the room
 	if err := r.notifyRoom(room, event.RoomJoin, event.RoomJoinedPayload{
 		Username: payload.Username,
+		RoomName: room.Name,
 	}); err != nil {
 		log.Printf("Error notifying room: %v", err)
 		return err
@@ -114,6 +116,7 @@ func (r *roomService) LeaveRoom(eventIncoming event.IncomingEvent, client *webso
 		return errors.New("client not in any room")
 	}
 
+	log.Printf("Client %v left room %v", client.UserId, codeRoom)
 	r.leaveRoom(clientRoom, client)
 	return nil
 }
@@ -161,6 +164,7 @@ func (r *roomService) leaveRoom(clientRoom *room.Room, client *websocket.Client)
 
 	// Delete room if no clients left
 	if room.GetClientCount() == 0 {
+		log.Printf("Deleting room %v as no clients are left", clientRoom.Code)
 		delete(r.rooms, clientRoom.Code)
 	} else {
 		// Or broadcast to other clients that a client has left

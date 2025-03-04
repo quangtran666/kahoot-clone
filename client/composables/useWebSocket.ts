@@ -1,6 +1,6 @@
 import { EventType, type RoomCreatedPayload, type RoomJoinedPayload, type WebSoketMessage } from "~/types/websocket";
 
-export const useWebSocket = (url: string, currentRoom: Ref<string>) => {
+export const useWebSocket = (url: string, currentRoomCode: Ref<string>, currentRoomName: Ref<string>) => {
     const socket = ref<WebSocket | null>(null);
     const isConnected = ref(false);
     const messages = ref<string[]>([]);
@@ -40,12 +40,14 @@ export const useWebSocket = (url: string, currentRoom: Ref<string>) => {
                     break
                 case EventType.RoomCreated:
                     const roomCreatedPayload = data.payload as RoomCreatedPayload
-                    currentRoom.value = roomCreatedPayload.room_code;
+                    currentRoomCode.value = roomCreatedPayload.room_code;
                     messages.value.push(`Room created successfully! Room Code: ${roomCreatedPayload.room_code}`)
                     break
                 case EventType.RoomJoin:
                     const roomJoinedPayload = data.payload as RoomJoinedPayload
-                    messages.value.push(`${roomJoinedPayload.username} has joined the room`);
+                    console.log(roomJoinedPayload);
+                    currentRoomName.value = roomJoinedPayload.room_name;
+                    messages.value.push(`${roomJoinedPayload.username} has joined the room ${roomJoinedPayload.room_name}`);
                     break
             }
         }

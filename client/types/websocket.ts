@@ -26,6 +26,7 @@ export interface JoinRoomPayload {
 
 export interface RoomJoinedPayload {
     username: string
+    room_name: string
 }
 
 export interface RoomLeftPayload {
@@ -34,6 +35,7 @@ export interface RoomLeftPayload {
 
 export interface RoomCreatedPayload { 
     room_code: string
+    room_name: string
 }
 
 export interface WebSoketMessage<T = any> {

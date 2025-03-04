@@ -51,6 +51,7 @@ type CreateRoomPayload struct {
 
 type RoomCreatedPayload struct {
 	RoomCode string `json:"room_code"`
+	RoomName string `json:"room_name"`
 }
 
 type JoinRoomPayload struct {
@@ -60,6 +61,7 @@ type JoinRoomPayload struct {
 
 type RoomJoinedPayload struct {
 	Username string `json:"username"`
+	RoomName string `json:"room_name"`
 }
 
 type RoomLeftPayload struct {
