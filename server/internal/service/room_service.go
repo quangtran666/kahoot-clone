@@ -79,7 +79,8 @@ func (r *roomService) JoinRoom(eventIncoming event.IncomingEvent, client *websoc
 		return errors.New("room not found")
 	}
 
-	// add client to room
+	// add client to room and rename the client
+	client.UserId = payload.Username
 	room.AddClient(client)
 
 	// Notify other clients in the room

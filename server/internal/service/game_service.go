@@ -42,7 +42,8 @@ func (s *gameService) HandleSendMessage(eventIncoming event.IncomingEvent, clien
 	// Only send messages to room participants - this simplifies the logic
 	room, inRoom := s.roomService.GetClientRoom(client)
 	if inRoom {
-		room.BroadcastToClientsExcept(message, client)
+		// Send message to all clients in the room
+		room.BroadcastToClients(message)
 	} else {
 		// Only send back to this client if not in a room
 		log.Println("User not in a room")
