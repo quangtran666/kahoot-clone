@@ -3,6 +3,7 @@
 import (
 	"encoding/json"
 	"log"
+	"net"
 	"time"
 
 	"github.com/google/uuid"
@@ -55,6 +56,8 @@ func (client *Client) ReadMessages() {
 			// If connection is closed, we will RECEIVE AN ERROR here
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error reading message: %v", err)
+			} else if err, ok := err.(net.Error); ok && err.Timeout() {
+				log.Printf("Connection timed out: Client %s exceeds pong waits time of %v", client.UserId, pongWait)
 			}
 			break // Break the loop to close connection and clean up
 		}

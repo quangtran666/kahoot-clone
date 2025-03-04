@@ -1,11 +1,13 @@
 ﻿package room
 
 import (
+	"log"
 	"math/rand"
 	"sync"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/quangtran666/kahoot-clone/internal/domain/event"
 	"github.com/quangtran666/kahoot-clone/internal/websocket"
 )
 
@@ -104,5 +106,17 @@ func (r *Room) BroadcastToClientsExcept(message []byte, except *websocket.Client
 	// Broadcast outside to avoid holding the lock, which can cause deadlocks
 	for _, client := range clients {
 		client.Egress <- message
+	}	
+}
+
+// SendToClient sends a message to a specific client
+func (r *Room) SendToClient(client *websocket.Client, eventType event.EventType, payload interface{}) error {
+	message, err := event.CreateOutgoingEvent(eventType, payload)
+	if err != nil {
+		log.Printf("Error creating outgoing event in [SendToClient]: %v", err)
+		return err
 	}
+
+	client.Egress <- message
+	return nil
 }

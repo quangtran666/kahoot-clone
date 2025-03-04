@@ -49,6 +49,14 @@ func (r *roomService) CreateRoom(eventIncoming event.IncomingEvent, client *webs
 	// Add Client to the room
 	newRoom.AddClient(client)
 
+	// Send back the room code to the client who created the room
+	if err := newRoom.SendToClient(client, event.RoomCreated, event.RoomCreatedPayload{
+		RoomCode: newRoom.Code,
+	}); err != nil {
+		log.Printf("Error sending room code to client: %v", err)
+		return err
+	}
+
 	log.Printf("Created room %v on %v", payload.RoomName, newRoom.Code)
 	return nil
 }
@@ -74,7 +82,7 @@ func (r *roomService) JoinRoom(eventIncoming event.IncomingEvent, client *websoc
 	room.AddClient(client)
 
 	// Notify other clients in the room
-	if err := r.notifyRoom(room, event.JoinRoom, event.RoomJoinedPayload{
+	if err := r.notifyRoom(room, event.RoomJoin, event.RoomJoinedPayload{
 		Username: payload.Username,
 	}); err != nil {
 		log.Printf("Error notifying room: %v", err)

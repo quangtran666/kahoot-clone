@@ -9,10 +9,12 @@ const (
 	UserConnected    EventType = "user_connected"
 	UserDisconnected EventType = "user_disconnected"
 
-	CreateRoom EventType = "create_room"
-	JoinRoom   EventType = "join_room"
-	LeaveRoom  EventType = "leave_room"
-	RoomLeft   EventType = "room_left"
+	CreateRoom  EventType = "create_room"
+	JoinRoom    EventType = "join_room"
+	LeaveRoom   EventType = "leave_room"
+	RoomLeft    EventType = "room_left"
+	RoomCreated EventType = "room_created"
+	RoomJoin    EventType = "room_joined"
 
 	Error EventType = "error"
 )
@@ -45,6 +47,10 @@ type SendMessagePayload struct {
 
 type CreateRoomPayload struct {
 	RoomName string `json:"room_name"`
+}
+
+type RoomCreatedPayload struct {
+	RoomCode string `json:"room_code"`
 }
 
 type JoinRoomPayload struct {

@@ -1,7 +1,6 @@
 import { EventType, type CreateRoomPayload, type JoinRoomPayload, type WebSoketMessage } from "~/types/websocket";
 
-export const useRoom = (sendMessage: (msg: WebSoketMessage) => void) => {
-    const currentRoom = ref<string>('');
+export const useRoom = (sendMessage: (msg: WebSoketMessage) => void, currentRoom: Ref<string>) => {
     const roomName = ref<string>('');
 
     const createRoom = (name: string) => {
@@ -37,14 +36,14 @@ export const useRoom = (sendMessage: (msg: WebSoketMessage) => void) => {
                 type: EventType.LeaveRoom,
                 payload: {}
             })
-
-            currentRoom.value = '';
+    
             roomName.value = '';
+        } else {
+            console.error("No room to leave");
         }
     }
 
     return {
-        currentRoom,
         roomName,
         createRoom,
         joinRoom,

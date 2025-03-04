@@ -55,8 +55,9 @@
 <script setup lang="ts">
 import { EventType } from '~/types/websocket';
 
-const { isConnected, messages, error, connect, sendMessage } = useWebSocket("ws://localhost:8080/ws")
-const { currentRoom, roomName, createRoom, joinRoom, leaveRoom } = useRoom(sendMessage)
+const currentRoom = ref('')
+const { isConnected, messages, error, connect, sendMessage } = useWebSocket("ws://localhost:8080/ws", currentRoom)
+const { roomName, createRoom, joinRoom, leaveRoom } = useRoom(sendMessage, currentRoom)
 
 const isCreating = ref(false)
 const roomState = ref({
